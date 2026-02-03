@@ -1,31 +1,31 @@
 {
-  "version": "2026.02.03",
-  "description": "Bloom - Jellyfin HTPC client (Development Build)",
-  "homepage": "https://github.com/crowquillx/Bloom",
-  "license": "GPL-3.0-or-later",
-  "architecture": {
-    "64bit": {
-      "url": "https://github.com/crowquillx/Bloom/releases/download/dev-latest/Bloom-Windows.zip",
-      "hash": "4442B4A2088847123D007F57436E5B8BCC1BC9DFCF0E6199C57CEB8FCD881B6E"
-    }
-  },
-  "bin": "Bloom.exe",
-  "shortcuts": [
-    [
-      "Bloom.exe",
-      "Bloom"
-    ]
-  ],
-  "checkver": {
-    "url": "https://api.github.com/repos/crowquillx/Bloom/releases/tags/dev-latest",
-    "jsonpath": "$..body",
-    "regex": "SHA256: `([a-fA-F0-9]{64})`"
-  },
-  "autoupdate": {
+    "version": "dev-latest",
+    "description": "Bloom - Jellyfin HTPC client (Development Build)",
+    "homepage": "https://github.com/crowquillx/Bloom",
+    "license": "MIT",
     "architecture": {
-      "64bit": {
-        "url": "https://github.com/crowquillx/Bloom/releases/download/dev-latest/Bloom-Windows.zip"
-      }
+        "64bit": {
+            "url": "https://github.com/crowquillx/Bloom/releases/download/dev-latest/Bloom-Windows.zip",
+            "hash": "0d0d92539d028a01b0a9a27a9e4200fb070aedeb380be114377d45e51f5206ab"
+        }
+    },
+    "bin": "Bloom.exe",
+    "shortcuts": [
+        [
+            "Bloom.exe",
+            "Bloom"
+        ]
+    ],
+    "checkver": {
+        "url": "https://api.github.com/repos/crowquillx/Bloom/releases/tags/dev-latest",
+        "jsonpath": "$..body",
+        "regex": "SHA256: `([a-fA-F0-9]{64})`"
+    },
+    "autoupdate": {
+        "architecture": {
+            "64bit": {
+                "url": "https://github.com/crowquillx/Bloom/releases/download/dev-latest/Bloom-Windows.zip"
+            }
+        }
     }
-  }
 }
