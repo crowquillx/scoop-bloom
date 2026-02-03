@@ -1,0 +1,93 @@
+name: Update Scoop Manifest
+
+on:
+  schedule:
+    # Check every hour
+    - cron: '0 * * * *'
+  workflow_dispatch:
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Fetch Release Info
+        id: fetch
+        run: |
+          REPO="${{ github.event.repository.owner.login || 'crowquillx' }}/Bloom"
+          echo "Checking release for repo: $REPO"
+          
+          RELEASE=$(curl -s "https://api.github.com/repos/$REPO/releases/tags/dev-latest")
+          
+          # Check if release exists
+          if echo "$RELEASE" | jq -e '.message == "Not Found"' > /dev/null 2>&1; then
+            echo "Release 'dev-latest' not found in $REPO"
+            echo "changed=false" >> $GITHUB_OUTPUT
+            echo "The workflow will skip updates until a 'dev-latest' release is created."
+            exit 0
+          fi
+          
+          # Extract URL and hash from release body
+          URL=$(echo "$RELEASE" | jq -r '.assets[] | select(.name == "Bloom-Windows.zip") | .browser_download_url')
+          HASH=$(echo "$RELEASE" | jq -r '.body' | grep -oE '[a-fA-F0-9]{64}' | head -1)
+          VERSION=$(echo "$RELEASE" | jq -r '.created_at' | cut -d'T' -f1 | tr '-' '.')
+          
+          if [ -z "$URL" ] || [ -z "$HASH" ]; then
+            echo "Could not extract URL or hash from release"
+            echo "changed=false" >> $GITHUB_OUTPUT
+            exit 0
+          fi
+          
+          echo "url=$URL" >> $GITHUB_OUTPUT
+          echo "hash=$HASH" >> $GITHUB_OUTPUT
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+          
+          echo "Found version: $VERSION"
+          echo "SHA256: ${HASH:0:16}..."
+
+      - name: Update Manifest
+        run: |
+          URL="${{ steps.fetch.outputs.url }}"
+          HASH="${{ steps.fetch.outputs.hash }}"
+          VERSION="${{ steps.fetch.outputs.version }}"
+          
+          if [ -z "$URL" ] || [ -z "$HASH" ]; then
+            echo "Failed to fetch release info"
+            exit 1
+          fi
+          
+          # Update manifest.json
+          jq --arg version "$VERSION" \
+             --arg url "$URL" \
+             --arg hash "$HASH" \
+             '.version = $version |
+              .architecture["64bit"].url = $url |
+              .architecture["64bit"].hash = $hash' \
+             bloom-dev.json > bloom-dev-new.json
+          
+          mv bloom-dev-new.json bloom-dev.json
+
+      - name: Check for Changes
+        id: check
+        run: |
+          if git diff --quiet bloom-dev.json; then
+            echo "changed=false" >> $GITHUB_OUTPUT
+            echo "No changes to manifest"
+          else
+            echo "changed=true" >> $GITHUB_OUTPUT
+            echo "Manifest updated"
+          fi
+
+      - name: Commit and Push
+        if: steps.check.outputs.changed == 'true' && steps.fetch.outputs.version != ''
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add bloom-dev.json
+          git commit -m "Update bloom-dev to version ${{ steps.fetch.outputs.version }}"
+          git push

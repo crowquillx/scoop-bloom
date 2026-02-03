@@ -1,0 +1,66 @@
+name: Validate Manifests
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+
+jobs:
+  validate:
+    runs-on: windows-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install Scoop
+        shell: powershell
+        run: |
+          Set-ExecutionPolicy RemoteSigned -Scope CurrentUser
+          irm get.scoop.sh | iex
+          echo "$env:USERPROFILE\scoop\shims" | Out-File -FilePath $env:GITHUB_PATH -Append
+
+      - name: Validate JSON syntax
+        shell: powershell
+        run: |
+          Get-ChildItem -Filter "*.json" | ForEach-Object {
+            Write-Host "Validating JSON syntax for $($_.Name)..."
+            try {
+              $null = Get-Content $_.FullName | ConvertFrom-Json
+              Write-Host "  JSON syntax OK"
+            } catch {
+              Write-Error "  JSON syntax error in $($_.Name): $($_.Exception.Message)"
+              exit 1
+            }
+          }
+
+      - name: Validate manifest with Scoop
+        shell: powershell
+        run: |
+          Get-ChildItem -Filter "*.json" | ForEach-Object {
+            Write-Host "Validating manifest $($_.Name) with Scoop..."
+            scoop install "$($_.FullName)"
+            if ($LASTEXITCODE -ne 0) {
+              Write-Error "Manifest validation failed for $($_.Name)"
+              exit 1
+            }
+          }
+        continue-on-error: true
+
+      - name: Check manifest format
+        shell: powershell
+        run: |
+          Get-ChildItem -Filter "*.json" | ForEach-Object {
+            Write-Host "Checking manifest format for $($_.Name)..."
+            $manifest = Get-Content $_.FullName | ConvertFrom-Json
+            
+            # Check required fields
+            $required = @('version', 'description', 'homepage', 'license', 'architecture', 'bin')
+            foreach ($field in $required) {
+              if (-not $manifest.$field) {
+                Write-Warning "Missing recommended field: $field"
+              }
+            }
+            
+            Write-Host "  Format check complete"
+          }

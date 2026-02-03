@@ -1,0 +1,32 @@
+{
+    "version": "dev-latest",
+    "description": "Bloom - Jellyfin HTPC client (Development Build)",
+    "homepage": "https://github.com/crowquillx/Bloom",
+    "license": "GPL-3.0-or-later",
+    "architecture": {
+        "64bit": {
+            "url": "https://github.com/crowquillx/Bloom/releases/download/dev-latest/Bloom-Windows.zip",
+            "hash": "",
+            "extract_dir": "Bloom-Windows"
+        }
+    },
+    "bin": "Bloom.exe",
+    "shortcuts": [
+        [
+            "Bloom.exe",
+            "Bloom"
+        ]
+    ],
+    "checkver": {
+        "url": "https://api.github.com/repos/crowquillx/Bloom/releases/tags/dev-latest",
+        "jsonpath": "$..body",
+        "regex": "SHA256: `([a-fA-F0-9]{64})`"
+    },
+    "autoupdate": {
+        "architecture": {
+            "64bit": {
+                "url": "https://github.com/crowquillx/Bloom/releases/download/dev-latest/Bloom-Windows.zip"
+            }
+        }
+    }
+}
