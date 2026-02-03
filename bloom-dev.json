@@ -6,7 +6,7 @@
     "architecture": {
         "64bit": {
             "url": "https://github.com/crowquillx/Bloom",
-            "hash": "0d0d92539d028a01b0a9a27a9e4200fb070aedeb380be114377d45e51f5206ab"
+            "hash": "0D0D92539D028A01B0A9A27A9E4200FB070AEDEB380BE114377D45E51F5206AB"
         }
     },
     "bin": "Bloom.exe",
