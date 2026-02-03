@@ -5,7 +5,7 @@
     "license": "MIT",
     "architecture": {
         "64bit": {
-            "url": "https://github.com/crowquillx/Bloom/releases/download/dev-latest/Bloom-Windows.zip",
+            "url": "https://github.com/crowquillx/Bloom",
             "hash": "0d0d92539d028a01b0a9a27a9e4200fb070aedeb380be114377d45e51f5206ab"
         }
     },
