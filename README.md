@@ -9,7 +9,7 @@ This is a [Scoop](https://scoop.sh) bucket for installing Bloom development buil
 1. Clone this repository to a location of your choice (or create a new GitHub repo with these files)
 2. Add the bucket to Scoop:
    ```powershell
-   scoop bucket add bloom-dev <path-or-url-to-bucket>
+   scoop bucket add bloom-dev https://github.com/crowquillx/scoop-bloom/raw/refs/heads/main/bloom-dev.json
    ```
 3. Install Bloom:
    ```powershell
@@ -19,7 +19,7 @@ This is a [Scoop](https://scoop.sh) bucket for installing Bloom development buil
 ### Direct URL Installation
 
 ```powershell
-scoop install https://raw.githubusercontent.com/YOUR-USERNAME/YOUR-BUCKET-REPO/main/bloom-dev.json
+scoop install https://github.com/crowquillx/scoop-bloom/raw/refs/heads/main/bloom-dev.json
 ```
 
 ## Features
