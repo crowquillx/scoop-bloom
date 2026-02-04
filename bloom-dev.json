@@ -6,7 +6,7 @@
   "architecture": {
     "64bit": {
       "url": "https://github.com/crowquillx/Bloom/releases/download/dev-latest/Bloom-Windows.zip",
-      "hash": "0D1E82D17B02E1F14F50BCD1D2FC8D4D6D1DDE1758645D13FDD8DCAD99FF1CAD"
+      "hash": "0D867FBC97C27535502B1540F88DB61BB547E82BADA54A6BD8989494F7AAAB71"
     }
   },
   "bin": "Bloom.exe",
