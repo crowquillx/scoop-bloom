@@ -1,9 +1,11 @@
 name: Update Scoop Manifest
 
 on:
+  repository_dispatch:
+    types: [update-manifest]
   schedule:
-    # Check every hour
-    - cron: '0 * * * *'
+    # Fallback check every 6 hours
+    - cron: '0 */6 * * *'
   workflow_dispatch:
 
 jobs:
@@ -19,7 +21,19 @@ jobs:
       - name: Fetch Release Info
         id: fetch
         run: |
-          REPO="${{ github.event.repository.owner.login || 'crowquillx' }}/Bloom"
+          # Check if triggered by repository_dispatch with payload
+          if [ -n "${{ github.event.client_payload.hash }}" ]; then
+            echo "Using payload from repository_dispatch"
+            echo "url=${{ github.event.client_payload.url }}" >> $GITHUB_OUTPUT
+            echo "hash=${{ github.event.client_payload.hash }}" >> $GITHUB_OUTPUT
+            echo "version=${{ github.event.client_payload.version }}" >> $GITHUB_OUTPUT
+            echo "Found version: ${{ github.event.client_payload.version }}"
+            echo "SHA256: ${{ github.event.client_payload.hash }}"
+            exit 0
+          fi
+          
+          # Fallback: fetch from GitHub API
+          REPO="crowquillx/Bloom"
           echo "Checking release for repo: $REPO"
           
           RELEASE=$(curl -s "https://api.github.com/repos/$REPO/releases/tags/dev-latest")
@@ -28,14 +42,13 @@ jobs:
           if echo "$RELEASE" | jq -e '.message == "Not Found"' > /dev/null 2>&1; then
             echo "Release 'dev-latest' not found in $REPO"
             echo "changed=false" >> $GITHUB_OUTPUT
-            echo "The workflow will skip updates until a 'dev-latest' release is created."
             exit 0
           fi
           
           # Extract URL and hash from release body
           URL=$(echo "$RELEASE" | jq -r '.assets[] | select(.name == "Bloom-Windows.zip") | .browser_download_url')
           HASH=$(echo "$RELEASE" | jq -r '.body' | grep -oE '[a-fA-F0-9]{64}' | head -1)
-          VERSION=$(echo "$RELEASE" | jq -r '.created_at' | cut -d'T' -f1 | tr '-' '.')
+          VERSION=$(date +%Y.%m.%d)
           
           if [ -z "$URL" ] || [ -z "$HASH" ]; then
             echo "Could not extract URL or hash from release"
