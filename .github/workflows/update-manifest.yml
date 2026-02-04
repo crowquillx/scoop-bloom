@@ -48,7 +48,7 @@ jobs:
           # Extract URL and hash from release body
           URL=$(echo "$RELEASE" | jq -r '.assets[] | select(.name == "Bloom-Windows.zip") | .browser_download_url')
           HASH=$(echo "$RELEASE" | jq -r '.body' | grep -oE '[a-fA-F0-9]{64}' | head -1)
-          VERSION=$(date +%Y.%m.%d)
+          VERSION=$(date -u +%Y.%m.%d.%H%M)
           
           if [ -z "$URL" ] || [ -z "$HASH" ]; then
             echo "Could not extract URL or hash from release"
