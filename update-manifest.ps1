@@ -78,7 +78,7 @@ if ($Hash -and $Version -and $Url) {
 }
 
 # Read the manifest template and update values
-$manifestPath = "$PSScriptRoot\bloom-dev.json"
+$manifestPath = "$PSScriptRoot\$OutputPath"
 if (-not (Test-Path $manifestPath)) {
     Write-Error "Manifest template not found at $manifestPath"
     exit 1

@@ -2,7 +2,7 @@ name: Update Scoop Manifest
 
 on:
   repository_dispatch:
-    types: [update-manifest]
+    types: [update-manifest, update-stable-manifest]
   schedule:
     # Fallback check every 6 hours
     - cron: '0 */6 * * *'
@@ -17,6 +17,15 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+
+      - name: Determine manifest file
+        id: manifest
+        run: |
+          if [ "${{ github.event.action }}" = "update-stable-manifest" ]; then
+            echo "file=bloom.json" >> $GITHUB_OUTPUT
+          else
+            echo "file=bloom-dev.json" >> $GITHUB_OUTPUT
+          fi
 
       - name: Fetch Release Info
         id: fetch
@@ -68,27 +77,29 @@ jobs:
           URL="${{ steps.fetch.outputs.url }}"
           HASH="${{ steps.fetch.outputs.hash }}"
           VERSION="${{ steps.fetch.outputs.version }}"
+          MANIFEST="${{ steps.manifest.outputs.file }}"
           
           if [ -z "$URL" ] || [ -z "$HASH" ]; then
             echo "Failed to fetch release info"
             exit 1
           fi
           
-          # Update manifest.json
+          # Update the determined manifest file
           jq --arg version "$VERSION" \
              --arg url "$URL" \
              --arg hash "$HASH" \
              '.version = $version |
               .architecture["64bit"].url = $url |
               .architecture["64bit"].hash = $hash' \
-             bloom-dev.json > bloom-dev-new.json
+             "$MANIFEST" > "${MANIFEST}.tmp"
           
-          mv bloom-dev-new.json bloom-dev.json
+          mv "${MANIFEST}.tmp" "$MANIFEST"
 
       - name: Check for Changes
         id: check
         run: |
-          if git diff --quiet bloom-dev.json; then
+          MANIFEST="${{ steps.manifest.outputs.file }}"
+          if git diff --quiet "$MANIFEST"; then
             echo "changed=false" >> $GITHUB_OUTPUT
             echo "No changes to manifest"
           else
@@ -101,6 +112,6 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add bloom-dev.json
-          git commit -m "Update bloom-dev to version ${{ steps.fetch.outputs.version }}"
+          git add bloom.json bloom-dev.json
+          git commit -m "Update ${{ steps.manifest.outputs.file }} to version ${{ steps.fetch.outputs.version }}"
           git push

@@ -1,55 +1,78 @@
 # Scoop Bucket for Bloom
 
-This is a [Scoop](https://scoop.sh) bucket for installing Bloom development builds.
+This is a [Scoop](https://scoop.sh) bucket for installing [Bloom](https://github.com/crowquillx/Bloom), a Jellyfin HTPC client.
+
+Two channels are available:
+
+| Channel | Manifest | Tracks |
+|---------|----------|--------|
+| **Stable** | `bloom` | Tagged releases (e.g. `v0.3.0`) |
+| **Dev** | `bloom-dev` | Rolling `dev-latest` builds |
 
 ## Installation
 
-### Using a Separate Bucket Repository
+### 1. Add the bucket
 
-1. Clone this repository to a location of your choice (or create a new GitHub repo with these files)
-2. Add the bucket to Scoop:
-   ```powershell
-   scoop bucket add bloom-dev https://github.com/crowquillx/scoop-bloom
-   ```
-3. Install Bloom:
-   ```powershell
-   scoop install bloom-dev
-   ```
+```powershell
+scoop bucket add bloom https://github.com/crowquillx/scoop-bloom
+```
+
+### 2. Install
+
+**Stable** (recommended):
+```powershell
+scoop install bloom
+```
+
+**Development builds**:
+```powershell
+scoop install bloom-dev
+```
 
 ### Direct URL Installation
 
+You can also install without adding the bucket:
+
 ```powershell
+# Stable
+scoop install https://github.com/crowquillx/scoop-bloom/raw/refs/heads/main/bloom.json
+
+# Dev
 scoop install https://github.com/crowquillx/scoop-bloom/raw/refs/heads/main/bloom-dev.json
 ```
 
 ## Features
 
-- **Auto-updates**: The manifest includes `checkver` and `autoupdate` sections for automated updates
-- **Development builds**: Points to the `dev-latest` release from the main Reef repository
-- **SHA256 verification**: Manifest includes hash verification for security
+- **Dual channels**: Stable tagged releases and rolling development builds
+- **Auto-updates**: Manifests are automatically updated via GitHub Actions when new releases are published
+- **SHA256 verification**: All manifests include hash verification for security
 
 ## Repository Structure
 
-This bucket provides:
+- [`bloom.json`](bloom.json) — Scoop manifest for stable releases
+- [`bloom-dev.json`](bloom-dev.json) — Scoop manifest for development builds
+- [`update-manifest.ps1`](update-manifest.ps1) — PowerShell script to update manifests manually
+- [`.github/workflows/update-manifest.yml`](.github/workflows/update-manifest.yml) — Automated workflow to sync manifests
 
-- [`bloom-dev.json`](bloom-dev.json) - Scoop manifest for development builds
-- [`update-manifest.ps1`](update-manifest.ps1) - PowerShell script to update the manifest
-- [`.github/workflows/update-manifest.yml`](.github/workflows/update-manifest.yml) - Automated workflow to sync the manifest
-
-## Updating the Manifest
+## Updating Manifests
 
 ### Automatic (via GitHub Actions)
 
-When a new release is published in the main Reef repository, the manifest is automatically updated via GitHub Actions.
+When a new release is published in the main Bloom repository, the corresponding manifest is automatically updated:
+- Tagged releases → `bloom.json` (via `update-stable-manifest` dispatch)
+- Dev builds → `bloom-dev.json` (via `update-manifest` dispatch)
 
 ### Manual
 
 ```powershell
-# Update to latest dev release
+# Update dev manifest to latest dev release
 ./update-manifest.ps1
 
-# Update to specific version
-./update-manifest.ps1 -Version "2025.02.03"
+# Update stable manifest
+./update-manifest.ps1 -OutputPath "bloom.json" -Tag "v0.3.0"
+
+# Update with specific version info
+./update-manifest.ps1 -Version "0.3.0" -Url "https://..." -Hash "abc123..."
 ```
 
 ## Troubleshooting
@@ -57,15 +80,15 @@ When a new release is published in the main Reef repository, the manifest is aut
 ### Hash Mismatch
 
 If you see a hash mismatch error, the manifest may be out of date. Either:
-- Wait for the auto-update to run (every hour or on new releases)
-- Run `scoop update bloom-dev` to fetch the latest manifest
-- Or use the `--skip-check` flag: `scoop install bloom-dev --skip-check`
+- Wait for the auto-update to run
+- Run `scoop update bloom` or `scoop update bloom-dev` to fetch the latest manifest
+- Or use the `--skip-check` flag: `scoop install bloom --skip-check`
 
 ### Issues Installing
 
 1. Ensure Scoop is installed: `Get-Command scoop`
 2. Try updating Scoop first: `scoop update`
-3. Check the manifest is valid: `scoop checkver bloom-dev`
+3. Check the manifest is valid: `scoop checkver bloom` or `scoop checkver bloom-dev`
 
 ## License
 
