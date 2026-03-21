@@ -44,7 +44,7 @@ scoop install https://github.com/crowquillx/scoop-bloom/raw/refs/heads/main/bloo
 ## Features
 
 - **Dual channels**: Stable tagged releases and rolling development builds
-- **Auto-updates**: Manifests are automatically updated via GitHub Actions when new releases are published
+- **Auto-updates**: Bloom dispatches GitHub Actions updates to this bucket when new releases are published
 - **SHA256 verification**: All manifests include hash verification for security
 
 ## Repository Structure
@@ -58,7 +58,7 @@ scoop install https://github.com/crowquillx/scoop-bloom/raw/refs/heads/main/bloo
 
 ### Automatic (via GitHub Actions)
 
-When a new release is published in the main Bloom repository, the corresponding manifest is automatically updated:
+When Bloom publishes a new release or dev build, it dispatches an update to this bucket and the corresponding manifest is refreshed:
 - Tagged releases → `bloom.json` (via `update-stable-manifest` dispatch)
 - Dev builds → `bloom-dev.json` (via `update-manifest` dispatch)
 
