@@ -1,12 +1,12 @@
 {
-  "version": "0.6.3",
+  "version": "0.6.4",
   "description": "Bloom - Jellyfin HTPC client",
   "homepage": "https://github.com/crowquillx/Bloom",
   "license": "MIT",
   "architecture": {
     "64bit": {
-      "url": "https://github.com/crowquillx/Bloom/releases/download/v0.6.3/Bloom-Windows.zip",
-      "hash": "C55B6E7F7C6DFD69FE52D218CBFBF05640EA071FC500615B6DA0B7F4011237B7"
+      "url": "https://github.com/crowquillx/Bloom/releases/download/v0.6.4/Bloom-Windows.zip",
+      "hash": "E1F1D097C9389505ED44F81714E27D211E02C28B803CD8C4515EE7A52F2BDE9F"
     }
   },
   "bin": "Bloom.exe",
